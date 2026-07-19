@@ -17,7 +17,6 @@
 #include "IPAlgorithms.h"
 #include <math.h>
 #include <emmintrin.h>
-#include <wx/wx.h>
 #include <wx/regex.h>
 #include <chrono>
 #include <iostream>
@@ -619,7 +618,7 @@ std::vector<color_range> GetColorRanges(wxArrayString& filter_colors)
 			}
 			else
 			{
-				wxMessageBox(wxString::Format(wxT("ERROR: Wrong Color Range Format: %s"), filter_colors[ci]), wxT("GetColorRanges"));
+				ShowVsfError(wxString::Format(wxT("ERROR: Wrong Color Range Format: %s"), filter_colors[ci]), wxT("GetColorRanges"));
 			}
 		}
 	}
@@ -8863,7 +8862,7 @@ void SaveBGRImage(simple_buffer<u8>& ImBGR, wxString name, int w, int h)
 	catch (runtime_error& ex) {
 		wxString msg;
 		msg.Printf(wxT("Exception saving image to %s format: %s\n"), g_im_save_format, wxString(ex.what()));
-		wxMessageBox(msg, "ERROR: SaveBGRImage");
+		ShowVsfError(msg, "ERROR: SaveBGRImage");
 	}
 }
 
@@ -8907,19 +8906,19 @@ void SaveGreyscaleImage(simple_buffer<u8>& Im, wxString name, int w, int h, int 
 	catch (runtime_error& ex) {
 		wxString msg;
 		msg.Printf(wxT("Exception saving image to %s format: %s\n"), g_im_save_format, wxString(ex.what()));
-		wxMessageBox(msg, "ERROR: SaveGreyscaleImage");
+		ShowVsfError(msg, "ERROR: SaveGreyscaleImage");
 	}
 	catch (const exception& ex)
 	{
 		wxString msg;
 		msg.Printf(wxT("Exception saving image to %s format: %s\n"), g_im_save_format, wxString(ex.what()));
-		wxMessageBox(msg, "ERROR: SaveGreyscaleImage");
+		ShowVsfError(msg, "ERROR: SaveGreyscaleImage");
 	}
 	catch (...)
 	{
 		wxString msg;
 		msg.Printf(wxT("Exception saving image to %s format\n"), g_im_save_format);
-		wxMessageBox(msg, "ERROR: SaveGreyscaleImage");
+		ShowVsfError(msg, "ERROR: SaveGreyscaleImage");
 	}
 }
 

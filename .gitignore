@@ -1,13 +1,18 @@
 # Ignore Everything
 *
 
-# But not:
+# But not source files
 !*.cpp
 !*.c
 !*.hpp
 !*.h
 !*.cu
 !.gitignore
-# Or directories
+!CMakeLists.txt
+
+# Don't ignore directories in general
 !*/
 
+# Ignore CMake build directory
+build/
+CMakeCXXCompilerId.cpp

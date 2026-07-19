@@ -302,7 +302,7 @@ void SaveBinaryImage(simple_buffer<T>& Im, wxString name, int w, int h, int qual
 	catch (runtime_error& ex) {
 		wxString msg;
 		msg.Printf(wxT("Exception saving image to %s format: %s\n"), g_im_save_format, wxString(ex.what()));
-		wxMessageBox(msg, "ERROR: SaveBinaryImage");
+		ShowVsfError(msg, "ERROR: SaveBinaryImage");
 	}
 }
 

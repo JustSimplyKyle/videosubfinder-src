@@ -17,9 +17,13 @@
 
 #include <time.h>
 #include <memory.h>
-#include <wx/wx.h>
+#include <cstdio>
+#include <wx/string.h>
 #include <wx/wfstream.h>
 #include <wx/txtstrm.h>
+#ifndef VSF_HEADLESS
+#include <wx/msgdlg.h>
+#endif
 #include "opencv2/imgcodecs.hpp"
 #include <condition_variable>
 #include <queue>
@@ -47,6 +51,15 @@ extern void PlaySound(wxString path);
 extern wxString g_ReportFileName;
 extern wxString g_ErrorFileName;
 extern wxString GetFileNameWithExtension(wxString FilePath);
+
+inline void ShowVsfError(const wxString& message, const wxString& caption)
+{
+#ifdef VSF_HEADLESS
+	fprintf(stderr, "%s: %s\n", caption.ToUTF8().data(), message.ToUTF8().data());
+#else
+	wxMessageBox(message, caption);
+#endif
+}
 
 inline void SaveToReportLog(char const* file, int line, wxString msg, wxString mode = wxT("ab"))
 {

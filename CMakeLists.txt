@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.13)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(USE_CUDA OFF)
+
 project(VideoSubFinderWXW LANGUAGES CXX)
 
 if(WIN32)

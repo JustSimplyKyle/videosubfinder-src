@@ -20,6 +20,21 @@
 #include <opencv2/core.hpp>
 #include <opencv2/core/ocl.hpp>
 
+#ifdef VSF_HEADLESS
+void VsfHeadlessProcessResult(
+	s64 start,
+	s64 end,
+	simple_buffer<u8>& ImBGR,
+	simple_buffer<u8>& ImISA,
+	simple_buffer<u16>& ImILA,
+	int w,
+	int h,
+	int W,
+	int H,
+	int xmin,
+	int ymin);
+#endif
+
 #ifdef CUSTOM_TA 
 #include "ittnotify.h"
 
@@ -594,7 +609,7 @@ public:
 		wait_all(begin(m_thrs_save_images), end(m_thrs_save_images));
 	}
 
-	void AddSaveImagesTask(simple_buffer<u8>& ImBGR, simple_buffer<u8>& ImISA, simple_buffer<u16>& ImILA, wxString name)
+	void AddSaveImagesTask(simple_buffer<u8>& ImBGR, simple_buffer<u8>& ImISA, simple_buffer<u16>& ImILA, wxString name, s64 begin, s64 end)
 	{
 		int w = m_w;
 		int h = m_h;
@@ -606,7 +621,10 @@ public:
 		int ymax = m_ymax;
 		bool convert_to_lab = m_convert_to_lab;
 
-		m_thrs_save_images.emplace_back(shared_custom_task([ImBGR, ImISA, ImILA, name, w, h, W, H, xmin, xmax, ymin, ymax, convert_to_lab]() mutable {
+		#ifdef VSF_HEADLESS
+		VsfHeadlessProcessResult(begin, end, ImBGR, ImISA, ImILA, w, h, W, H, xmin, ymin);
+		#else
+		m_thrs_save_images.emplace_back(shared_custom_task([ImBGR, ImISA, ImILA, name, begin, end, w, h, W, H, xmin, xmax, ymin, ymax, convert_to_lab]() mutable {
 					{
 						simple_buffer<u8> ImTMP_BGR(W * H * 3);
 						ImBGRToNativeSize(ImBGR, ImTMP_BGR, w, h, W, H, xmin, xmax, ymin, ymax);
@@ -648,6 +666,7 @@ public:
 				}
 			)
 		);
+		#endif
 	}
 
 	int AddGetRGBImagesTask(int fn, int num)
@@ -1617,7 +1636,7 @@ s64 FastSearchSubtitles(CVideo *pV, s64 Begin, s64 End)
 #endif
 
 									Str = VideoTimeToStr(pbt) + wxT("__") + VideoTimeToStr(pet) + wxT("_") + FormatImInfoAddData(W, H, xmin, ymin, w, h);
-									rs.AddSaveImagesTask(ImFSP, ImIntSP, ImYSP, Str);
+					rs.AddSaveImagesTask(ImFSP, ImIntSP, ImYSP, Str, pbt, pet);
 								}
 
 #ifdef CUSTOM_DEBUG
@@ -1880,7 +1899,7 @@ s64 FastSearchSubtitles(CVideo *pV, s64 Begin, s64 End)
 #endif
 
 							Str = VideoTimeToStr(pbt) + wxT("__") + VideoTimeToStr(pet) + wxT("_") + FormatImInfoAddData(W, H, xmin, ymin, w, h);
-							rs.AddSaveImagesTask(ImFSP, ImIntSP, ImYSP, Str);
+							rs.AddSaveImagesTask(ImFSP, ImIntSP, ImYSP, Str, pbt, pet);
 						}
 					}
 
@@ -1909,7 +1928,7 @@ s64 FastSearchSubtitles(CVideo *pV, s64 Begin, s64 End)
 #endif
 
 								Str = VideoTimeToStr(bt) + wxT("__") + VideoTimeToStr(et) + wxT("_") + FormatImInfoAddData(W, H, xmin, ymin, w, h);
-								rs.AddSaveImagesTask(ImFS, ImIntS, ImYS, Str);
+								rs.AddSaveImagesTask(ImFS, ImIntS, ImYS, Str, bt, et);
 							}
 						}
 						else
@@ -1935,7 +1954,7 @@ s64 FastSearchSubtitles(CVideo *pV, s64 Begin, s64 End)
 #endif
 
 								Str = VideoTimeToStr(bt) + wxT("__") + VideoTimeToStr(et) + wxT("_") + FormatImInfoAddData(W, H, xmin, ymin, w, h);
-								rs.AddSaveImagesTask(ImFSP, ImIntSP, ImYSP, Str);
+								rs.AddSaveImagesTask(ImFSP, ImIntSP, ImYSP, Str, bt, et);
 							}
 						}
 					}
@@ -1990,7 +2009,7 @@ s64 FastSearchSubtitles(CVideo *pV, s64 Begin, s64 End)
 #endif
 
 			Str = VideoTimeToStr(pbt) + wxT("__") + VideoTimeToStr(pet) + wxT("_") + FormatImInfoAddData(W, H, xmin, ymin, w, h);
-			rs.AddSaveImagesTask(ImFSP, ImIntSP, ImYSP, Str);
+			rs.AddSaveImagesTask(ImFSP, ImIntSP, ImYSP, Str, pbt, pet);
 		}
 	}
 
