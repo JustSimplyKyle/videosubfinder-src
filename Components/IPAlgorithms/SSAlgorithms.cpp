@@ -16,7 +16,9 @@
 
 #include "SSAlgorithms.h"
 #include <math.h>
+#ifndef VSF_HEADLESS
 #include <wx/regex.h>
+#endif
 #include <opencv2/core.hpp>
 #include <opencv2/core/ocl.hpp>
 

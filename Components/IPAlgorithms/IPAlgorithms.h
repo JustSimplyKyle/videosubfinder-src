@@ -19,8 +19,10 @@
 #include "SSAlgorithms.h"
 #include "DataTypes.h"
 #include "MyClosedFigure.h"
+#ifndef VSF_HEADLESS
 #include <wx/string.h>
 #include <wx/wfstream.h>
+#endif
 #include <fstream>
 #include <execution>
 #include <algorithm>

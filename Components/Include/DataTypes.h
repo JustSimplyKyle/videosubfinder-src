@@ -18,10 +18,12 @@
 #include <time.h>
 #include <memory.h>
 #include <cstdio>
+#ifdef VSF_HEADLESS
+#include "WxCompat.h"
+#else
 #include <wx/string.h>
 #include <wx/wfstream.h>
 #include <wx/txtstrm.h>
-#ifndef VSF_HEADLESS
 #include <wx/msgdlg.h>
 #endif
 #include "opencv2/imgcodecs.hpp"

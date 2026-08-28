@@ -20,7 +20,9 @@
 #include "DataTypes.h"
 #include "MyClosedFigure.h"
 #include "Video.h"
+#ifndef VSF_HEADLESS
 #include <wx/string.h>
+#endif
 #include <chrono>
 
 using namespace std;

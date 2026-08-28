@@ -18,7 +18,9 @@
 
 #include "DataTypes.h"
 #include <vector>
+#ifndef VSF_HEADLESS
 #include <wx/wx.h>
+#endif
 
 using namespace std;
 
@@ -489,4 +491,3 @@ u64 SearchClosedFigures(simple_buffer<T>& Im, int w, int h, T white, custom_buff
 
 	return 1/*(std::chrono::high_resolution_clock::now() - start)*/;
 }
-

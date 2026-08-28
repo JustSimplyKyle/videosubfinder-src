@@ -17,7 +17,9 @@
 #include "IPAlgorithms.h"
 #include <math.h>
 #include <emmintrin.h>
+#ifndef VSF_HEADLESS
 #include <wx/regex.h>
+#endif
 #include <chrono>
 #include <iostream>
 #include <algorithm>
