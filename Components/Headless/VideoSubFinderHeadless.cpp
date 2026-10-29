@@ -7,7 +7,6 @@
 #include <cstring>
 #include <cmath>
 #include <limits>
-#include <mutex>
 #include <vector>
 
 // The legacy algorithm's logging hooks normally live in the wxWidgets GUI.
@@ -19,10 +18,24 @@ void PlaySound(wxString) {}
 
 namespace
 {
-std::mutex search_mutex;
-void* active_context = nullptr;
-vsf_headless_segment_fn active_segment = nullptr;
-bool active_apply_ocr_image_cleanup = true;
+// Per-search callback state, reachable from the algorithm's worker threads
+// through VsfContext::host.
+struct HeadlessHost
+{
+    void* context;
+    vsf_headless_segment_fn segment;
+    bool apply_ocr_image_cleanup;
+};
+
+// Settings shared by every headless entry point: no GPU, GUI or image files.
+void apply_headless_defaults(VsfContext& ctx)
+{
+    ctx.use_cuda_gpu = false;
+    ctx.use_ocl = false;
+    ctx.disable_save_images = true;
+    ctx.show_results = false;
+    ctx.show_sf_results = false;
+}
 
 bool valid_ratio(double value)
 {
@@ -168,15 +181,9 @@ int32_t vsf_headless_transform_bgr(
 
     try
     {
-        // The legacy implementation uses process-global configuration.
-        const std::lock_guard<std::mutex> lock(search_mutex);
-
-        // This target deliberately has no CUDA dependency.
-        g_use_cuda_gpu = false;
-        g_use_ocl = false;
-        g_disable_save_images = true;
-        g_show_results = false;
-        g_show_sf_results = false;
+        VsfContext ctx;
+        apply_headless_defaults(ctx);
+        VsfContextScope scope(&ctx);
 
         simple_buffer<u8> input(static_cast<int>(pixels * 3));
         simple_buffer<u8> first_filtered(static_cast<int>(pixels), static_cast<u8>(0));
@@ -221,7 +228,8 @@ void VsfHeadlessProcessResult(
     int xmin,
     int ymin)
 {
-    if (active_segment == nullptr)
+    const auto* host = static_cast<const HeadlessHost*>(vsf_ctx().host);
+    if (host == nullptr || host->segment == nullptr)
     {
         return;
     }
@@ -229,10 +237,10 @@ void VsfHeadlessProcessResult(
     try
     {
         const int pixels = w * h;
-        if (!active_apply_ocr_image_cleanup)
+        if (!host->apply_ocr_image_cleanup)
         {
-            if (active_segment(
-                active_context,
+            if (host->segment(
+                host->context,
                 start,
                 end,
                 bgr.m_pData,
@@ -304,8 +312,8 @@ void VsfHeadlessProcessResult(
 
         if (cleanup_result > 0)
         {
-            if (active_segment(
-                active_context,
+            if (host->segment(
+                host->context,
                 start,
                 end,
                 cleaned.m_pData,
@@ -326,8 +334,8 @@ void VsfHeadlessProcessResult(
         {
             fallback[i] = isa[i] == 0 ? 255 : 0;
         }
-        if (active_segment(
-            active_context,
+        if (host->segment(
+            host->context,
             start,
             end,
             fallback.m_pData,
@@ -368,56 +376,38 @@ int32_t vsf_headless_search(
         return -5;
     }
 
-    const std::lock_guard<std::mutex> lock(search_mutex);
     try
     {
-        g_use_cuda_gpu = false;
-        g_use_ocl = false;
-        g_disable_save_images = true;
-        g_show_results = false;
-        g_show_sf_results = false;
-        g_save_each_substring_separately = false;
-        g_save_scaled_images = true;
-        g_threads = params->threads;
-        g_DL = params->min_subtitle_frames;
-        g_tp = params->text_percent;
-        g_mtpl = params->min_text_length;
-        g_veple = params->vertical_edges_line_error;
-        g_ilaple = params->ila_points_line_error;
-        g_max_dl_down = params->max_frame_gap_down;
-        g_max_dl_up = params->max_frame_gap_up;
-        g_use_ISA_images_for_search_subtitles = params->use_isa_images != 0;
-        g_use_ILA_images_for_search_subtitles = params->use_ila_images != 0;
-        g_replace_ISA_by_filtered_version = params->replace_isa_with_filtered != 0;
-        g_RunSubSearch = 1;
+        HeadlessHost host{context, segment, params->apply_ocr_image_cleanup != 0};
 
-        active_context = context;
-        active_segment = segment;
-        active_apply_ocr_image_cleanup = params->apply_ocr_image_cleanup != 0;
+        VsfContext ctx;
+        apply_headless_defaults(ctx);
+        ctx.save_each_substring_separately = false;
+        ctx.save_scaled_images = true;
+        ctx.threads = params->threads;
+        ctx.DL = params->min_subtitle_frames;
+        ctx.tp = params->text_percent;
+        ctx.mtpl = params->min_text_length;
+        ctx.veple = params->vertical_edges_line_error;
+        ctx.ilaple = params->ila_points_line_error;
+        ctx.max_dl_down = params->max_frame_gap_down;
+        ctx.max_dl_up = params->max_frame_gap_up;
+        ctx.use_ISA_images_for_search_subtitles = params->use_isa_images != 0;
+        ctx.use_ILA_images_for_search_subtitles = params->use_ila_images != 0;
+        ctx.replace_ISA_by_filtered_version = params->replace_isa_with_filtered != 0;
+        ctx.RunSubSearch = 1;
+        ctx.host = &host;
+        VsfContextScope scope(&ctx);
 
         CallbackVideo video(width, height, context, next_frame);
-        if (!video.m_Inited)
+        if (video.m_Inited)
         {
-            active_context = nullptr;
-            active_segment = nullptr;
-            active_apply_ocr_image_cleanup = true;
-            g_RunSubSearch = 0;
-            return video.source_error() ? -4 : 0;
+            FastSearchSubtitles(&video, 0, -1);
         }
-
-        FastSearchSubtitles(&video, 0, -1);
-        active_context = nullptr;
-        active_segment = nullptr;
-        active_apply_ocr_image_cleanup = true;
-        g_RunSubSearch = 0;
         return video.source_error() ? -4 : 0;
     }
     catch (...)
     {
-        active_context = nullptr;
-        active_segment = nullptr;
-        active_apply_ocr_image_cleanup = true;
-        g_RunSubSearch = 0;
         return -3;
     }
 }

@@ -53,27 +53,11 @@ __itt_string_handle* shAddIntersectImagesTaskV2 = __itt_string_handle_create(L"A
 __itt_string_handle* shSubFound = __itt_string_handle_create(L"SubFound");
 #endif
 
-std::chrono::time_point<std::chrono::high_resolution_clock> g_StartTimeRunSubSearch = std::chrono::high_resolution_clock::now();
-int		g_RunSubSearch = 0;
 
-int    g_threads = -1;
 
-int		g_DL = 6;	 //sub frame length
-double	g_tp = 0.3;	 //text percent
-double	g_mtpl = 0.022;  //min text len (in percent)
-double	g_veple = 0.30; //vedges points line error
-double	g_ilaple = 0.30; //ILA points line error
 
-bool g_use_ISA_images_for_search_subtitles = true;
-bool g_use_ILA_images_for_search_subtitles = true;
-bool g_replace_ISA_by_filtered_version = true;
-int g_max_dl_down = 20;
-int g_max_dl_up = 40;
 
-double	g_video_contrast = 1.0; //1.0 default without change
-double	g_video_gamma = 1.0; //1.0 default without change
 
-CVideo *g_pV;
 
 inline int AnalizeImageForSubPresence(simple_buffer<u8> &ImNE, simple_buffer<u8> &ImISA, simple_buffer<u16> &ImIL, s64 CurPos, int fn, int w, int h, int W, int H, int min_x, int max_x)
 {

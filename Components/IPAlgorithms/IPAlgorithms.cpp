@@ -80,95 +80,35 @@ wxString  g_prev_data_path;
 wxString  g_im_save_format = ".jpeg";
 //wxString  g_im_save_format = ".bmp";
 
-double	g_mthr = 0.4;
-double	g_smthr = 0.25;
-double	g_mnthr = 0.3;
-int		g_segw = 8;
-int     g_segh = 3;  
-int		g_msegc = 2;
-int		g_scd = 800;
-double	g_btd = 0.05;
-double	g_to = 0.1; // Max Text Offset
 
-int		g_mpn = 50;
-double	g_mpd = 0.3;
-double  g_msh = 0.01;
-double  g_msd = 0.2;
-double	g_mpned = 0.3;
 
-int g_min_alpha_color = 1;
 
-int g_dmaxy = 8;
 
 /// min-max point size for resolution ~ 480p=640×480 scaled to x4 == 4-18p (1-4.5p in original size)
-double g_minpw = 4.0/640.0;
-double g_maxpw = 18.0/640.0;
-double g_minph = 4.0/480.0;
-double g_maxph = 18.0/480.0;
-double g_minpwh = 2.0/3.0;
 
-int g_min_dI = 9;
-int g_min_dQ = 9;
-int g_min_ddI = 14;
-int g_min_ddQ = 14;
 
-int g_scale = 4;
 
 #define STR_SIZE (256 * 2)
 
 #define MAX_EDGE_STR (11 * 16 * 256)
 
-bool g_use_ILA_images_for_getting_txt_symbols_areas = false;
-bool g_use_ILA_images_before_clear_txt_images_from_borders = false;
-bool g_use_ILA_images_for_clear_txt_images = true;
-bool g_use_gradient_images_for_clear_txt_images = true;
-bool g_clear_txt_images_by_main_color = true;
 
-bool g_clear_image_logical = false;
 
-bool g_generate_cleared_text_images_on_test = false;
-bool g_show_results = false;
-bool g_show_sf_results = false;
-bool g_clear_test_images_folder = true;
-bool g_show_transformed_images_only = false;
 
 bool g_wxImageHandlersInitialized = false;
 
-bool g_use_ocl = true;
 
-bool g_use_cuda_gpu = true;
 
-wxArrayString g_use_filter_color;
-wxArrayString g_use_outline_filter_color;
-std::vector<color_range> g_color_ranges;
-std::vector<color_range> g_outline_color_ranges;
 
-int g_dL_color = 40;
-int g_dA_color = 30;
-int g_dB_color = 30;
 
-bool g_combine_to_single_cluster = false;
 
-int g_cuda_kmeans_initial_loop_iterations = 10;
-int g_cuda_kmeans_loop_iterations = 30;
-int g_cpu_kmeans_initial_loop_iterations = 10;
-int g_cpu_kmeans_loop_iterations = 10;
 
-double g_min_h = 12.0 / 720.0; // ~ min sub height in percents to image height
 
-bool g_remove_wide_symbols = true;
 
-bool g_disable_save_images = false;
 
-bool g_save_each_substring_separately = true;
-bool g_save_scaled_images = true;
 
-bool g_border_is_darker  = true;
 
-bool g_extend_by_grey_color = false;
-int g_allow_min_luminance = 100;
 
-TextAlignment g_text_alignment = TextAlignment::Center;
 
 int ClearImageLogical(simple_buffer<u8>& Im, int w, int h, int W, int H, int real_im_x_center, int yb, int ye, u8 white, wxString iter_det)
 {

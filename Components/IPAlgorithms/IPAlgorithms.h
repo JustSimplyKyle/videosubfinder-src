@@ -48,76 +48,26 @@ extern wxString   g_app_dir;
 extern wxString   g_prev_data_path;
 extern wxString   g_im_save_format;
 
-extern double	g_smthr;  //moderate threshold for scaled image
-extern double	g_mthr;  //moderate threshold
-extern double	g_mnthr; //moderate threshold for NEdges
-extern int		g_segw;  //segment width
-extern int		g_segh;  //segment height
-extern int		g_msegc; //minimum segments count
-extern int		g_scd;   //min sum color diff
-extern double	g_btd;   //between text distace
-extern double	g_to;   //text offset
 
-extern int		g_mpn;	 //min points number
-extern double	g_mpd;   //min points density
-extern double   g_msh;	 //min symbol height in percents to full image height
-extern double   g_msd;   //min symbol density (percent of its pixels / w*h of symbol)
 
-extern double	g_mpned; //min NEdges points density
 
-extern int		g_scale;
 
-extern bool		g_clear_image_logical;
 
-extern bool		g_generate_cleared_text_images_on_test;
-extern bool		g_show_results;
-extern bool		g_show_sf_results;
-extern bool		g_clear_test_images_folder;
-extern bool		g_show_transformed_images_only;
 
-extern int		g_dmaxy;
 
-extern bool		g_use_ocl;
-extern bool		g_use_cuda_gpu;
 
-extern wxArrayString g_use_filter_color;
-extern wxArrayString g_use_outline_filter_color;
-extern std::vector<color_range> g_color_ranges;
-extern std::vector<color_range> g_outline_color_ranges;
 
-extern int g_dL_color;
-extern int g_dA_color;
-extern int g_dB_color;
 
-extern bool g_combine_to_single_cluster;
 
-extern int		g_cuda_kmeans_initial_loop_iterations;
-extern int		g_cuda_kmeans_loop_iterations;
 
-extern int		g_cpu_kmeans_initial_loop_iterations;
-extern int		g_cpu_kmeans_loop_iterations;
 
-extern int		g_min_alpha_color;
 
-extern bool		g_use_gradient_images_for_clear_txt_images;
-extern bool		g_clear_txt_images_by_main_color;
-extern bool		g_use_ILA_images_for_clear_txt_images;
-extern bool		g_use_ILA_images_before_clear_txt_images_from_borders;
-extern bool		g_use_ILA_images_for_getting_txt_symbols_areas;
 
 // Settings for logical filtering
-extern bool g_remove_wide_symbols;
 
-extern bool		g_disable_save_images;
 
-extern bool     g_save_each_substring_separately;
-extern bool     g_save_scaled_images;
-extern bool		g_border_is_darker;
 
-extern TextAlignment g_text_alignment;
 
-extern bool g_extend_by_grey_color;
-extern int g_allow_min_luminance;
 
 std::vector<color_range> GetColorRanges(wxArrayString& filter_colors);
 

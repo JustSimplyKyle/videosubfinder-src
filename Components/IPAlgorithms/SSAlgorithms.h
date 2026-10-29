@@ -27,21 +27,8 @@
 
 using namespace std;
 
-extern std::chrono::time_point<std::chrono::high_resolution_clock> g_StartTimeRunSubSearch;
-extern int		g_RunSubSearch;
 
-extern int      g_threads; // number of threads
-extern int		g_DL;	 //sub frame length
-extern double	g_tp;	 //text percent
-extern double	g_mtpl;  //min text len (in percent)
-extern double	g_veple; //vedges points line error
-extern double	g_ilaple; //ILA points line error
 
-extern bool g_use_ISA_images_for_search_subtitles;
-extern bool g_use_ILA_images_for_search_subtitles;
-extern bool g_replace_ISA_by_filtered_version;
-extern int g_max_dl_down;
-extern int g_max_dl_up;
 
 s64 FastSearchSubtitles(CVideo *pV, s64 Begin, s64 End);
 

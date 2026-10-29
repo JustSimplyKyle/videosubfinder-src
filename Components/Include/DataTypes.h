@@ -103,10 +103,7 @@ extern int exception_filter(unsigned int code, struct _EXCEPTION_POINTERS* ep, c
 // NOTE: cv::Mat real    3m23.222s
 #define cvMAT cv::Mat
 
-extern bool g_use_ocl;
 
-extern double g_video_contrast;
-extern double g_video_gamma;
 
 #ifdef CUSTOM_DEBUG
 #define wxDEBUG_DET(det) det
@@ -148,6 +145,8 @@ enum TextAlignment : int {
 	Right,	
 	Any
 };
+
+#include "VsfContext.h"
 
 class custom_event
 {
@@ -261,7 +260,11 @@ private:
 
 #ifdef WIN32 // WINX86 or WIN64
 #ifdef WIN64
-#define run_in_parallel concurrency::parallel_invoke
+template <typename... _Functions>
+inline void run_in_parallel(const _Functions&... _Funcs)
+{
+	concurrency::parallel_invoke(vsf_bind_ctx(_Funcs)...);
+}
 #endif
 #ifdef WINX86
 // replacing run_in_parallel to sequential run in 1 thread
@@ -303,8 +306,8 @@ inline void run_in_parallel(const _Function1& _Func1, const _Function2& _Func2, 
 template <typename _Function1, typename _Function2>
 inline void run_in_parallel(const _Function1& _Func1, const _Function2& _Func2)
 {
-	std::thread t1(_Func1);
-	std::thread t2(_Func2);
+	std::thread t1(vsf_bind_ctx(_Func1));
+	std::thread t2(vsf_bind_ctx(_Func2));
 
 	t1.join();
 	t2.join();
@@ -313,9 +316,9 @@ inline void run_in_parallel(const _Function1& _Func1, const _Function2& _Func2)
 template <typename _Function1, typename _Function2, typename _Function3>
 inline void run_in_parallel(const _Function1& _Func1, const _Function2& _Func2, const _Function3& _Func3)
 {
-	std::thread t1(_Func1);
-	std::thread t2(_Func2);
-	std::thread t3(_Func3);
+	std::thread t1(vsf_bind_ctx(_Func1));
+	std::thread t2(vsf_bind_ctx(_Func2));
+	std::thread t3(vsf_bind_ctx(_Func3));
 
 	t1.join();
 	t2.join();
@@ -325,10 +328,10 @@ inline void run_in_parallel(const _Function1& _Func1, const _Function2& _Func2, 
 template <typename _Function1, typename _Function2, typename _Function3, typename _Function4>
 inline void run_in_parallel(const _Function1& _Func1, const _Function2& _Func2, const _Function3& _Func3, const _Function4& _Func4)
 {
-	std::thread t1(_Func1);
-	std::thread t2(_Func2);
-	std::thread t3(_Func3);
-	std::thread t4(_Func4);
+	std::thread t1(vsf_bind_ctx(_Func1));
+	std::thread t2(vsf_bind_ctx(_Func2));
+	std::thread t3(vsf_bind_ctx(_Func3));
+	std::thread t4(vsf_bind_ctx(_Func4));
 
 	t1.join();
 	t2.join();
@@ -339,11 +342,11 @@ inline void run_in_parallel(const _Function1& _Func1, const _Function2& _Func2, 
 template <typename _Function1, typename _Function2, typename _Function3, typename _Function4, typename _Function5>
 inline void run_in_parallel(const _Function1& _Func1, const _Function2& _Func2, const _Function3& _Func3, const _Function4& _Func4, const _Function5& _Func5)
 {
-	std::thread t1(_Func1);
-	std::thread t2(_Func2);
-	std::thread t3(_Func3);
-	std::thread t4(_Func4);
-	std::thread t5(_Func5);
+	std::thread t1(vsf_bind_ctx(_Func1));
+	std::thread t2(vsf_bind_ctx(_Func2));
+	std::thread t3(vsf_bind_ctx(_Func3));
+	std::thread t4(vsf_bind_ctx(_Func4));
+	std::thread t5(vsf_bind_ctx(_Func5));
 
 	t1.join();
 	t2.join();
@@ -361,7 +364,7 @@ class shared_custom_task
 		std::mutex m_mutex;
 
 		template<typename _Function>
-		custom_task_data(const _Function& _Func) : m_thr(_Func) {}
+		custom_task_data(const _Function& _Func) : m_thr(vsf_bind_ctx(_Func)) {}
 
 		void wait()
 		{
